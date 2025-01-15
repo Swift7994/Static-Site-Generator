@@ -1,9 +1,10 @@
 from textnode import TextNode, TextType
-from htmlnode import HTMLNode
+from parentnode import *
 
 def main():
-    dummy_node = TextNode("This is a test textnode", TextType.BOLD, "https://www.boot.dev")
-    print(dummy_node)
+    node = ParentNode("div", ["hey", "man"], {"class": "empty"})
+    for child in node.children:
+        print(f"debug - {child}")
 
 if __name__ == "__main__":
     main()

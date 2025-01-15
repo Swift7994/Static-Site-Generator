@@ -4,18 +4,7 @@ class LeafNode(HTMLNode):
     def __init__(self, tag, value, props=None):
         if value is None:
             raise ValueError("LeafNode must have a value")
-        self._children = []
-        super().__init__(tag=tag, value=value, props=props)
-
-    @property
-    def children(self):
-        return []
-
-    @children.setter
-    def children(self, value):
-        if value != []:
-            raise AttributeError("LeafNode does not support children.")
-        self._children = []
+        super().__init__(tag, value, None, props)
 
     def to_html(self):
         if self.tag is None:
@@ -26,3 +15,6 @@ class LeafNode(HTMLNode):
         if not isinstance(other, LeafNode):
             return False
         return (self.tag == other.tag and self.value == other.value and self.props == other.props)
+    
+    def __repr__(self):
+        return f"LeafNode({self.tag}, {self.value}, {self.props})"

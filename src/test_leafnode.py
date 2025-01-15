@@ -15,12 +15,12 @@ class TestTextNode(unittest.TestCase):
         self.assertEqual(node.tag, "span")
         self.assertEqual(node.value, "Hello, World!")
         self.assertEqual(node.props, {"class": "greeting"})
-        self.assertEqual(node.children, [])
+        self.assertEqual(node.children, None)
         self.assertEqual(node.to_html(), '<span class="greeting">Hello, World!</span>')
 
     def test_props(self):
         leaf = LeafNode("p", "This is a paragraph.")
-        self.assertEqual(leaf.props, {})
+        self.assertEqual(leaf.props, None)
         self.assertEqual(leaf.to_html(), "<p>This is a paragraph.</p>")
 
     def test_value(self):
@@ -30,8 +30,3 @@ class TestTextNode(unittest.TestCase):
     def test_tag(self):
         node = LeafNode(None, "Just text")
         self.assertEqual(node.to_html(), "Just text")
-
-    def test_add_children(self):
-        node = LeafNode("span", "Hello, World!", {"class": "greeting"})
-        with self.assertRaises(AttributeError):
-            node.children = ["child1"]
