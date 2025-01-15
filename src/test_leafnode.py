@@ -30,3 +30,8 @@ class TestTextNode(unittest.TestCase):
     def test_tag(self):
         node = LeafNode(None, "Just text")
         self.assertEqual(node.to_html(), "Just text")
+
+
+
+if __name__ == "__main__":
+    unittest.main()

@@ -2,7 +2,7 @@ from textnode import TextNode, TextType
 from parentnode import *
 
 def main():
-    node = ParentNode("div", ["hey", "man"], {"class": "empty"})
+    node = ParentNode("div", [], {"class": "empty"})
     for child in node.children:
         print(f"debug - {child}")
 
