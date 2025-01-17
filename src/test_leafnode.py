@@ -2,7 +2,7 @@ import unittest
 from leafnode import LeafNode
 
 
-class TestTextNode(unittest.TestCase):
+class TestLeafNode(unittest.TestCase):
     def test_eq(self):
         node1 = LeafNode("span", "Hello", {"class": "greeting"})
         node2 = LeafNode("span", "Hello", {"class": "greeting"})
