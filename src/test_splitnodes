@@ -1,0 +1,97 @@
+import unittest
+from textnode import TextType, TextNode
+from splitnodes import split_nodes_delimiter
+
+class TestSplitNodesDelimiter(unittest.TestCase):
+    def test_split_simple(self):
+        nodes = [TextNode("Hello *bold* world", TextType.TEXT)]
+        result = split_nodes_delimiter(nodes, "*", TextType.BOLD)
+        expected = [
+            TextNode("Hello ", TextType.TEXT),
+            TextNode("bold", TextType.BOLD),
+            TextNode(" world", TextType.TEXT),
+        ]
+        self.assertEqual(result, expected)
+
+    def test_no_delimiter(self):
+        nodes = [TextNode("Hello world", TextType.TEXT)]
+        result = split_nodes_delimiter(nodes, "*", TextType.BOLD)
+        self.assertEqual(result, nodes)
+
+    def test_multiple_delimiters(self):
+        nodes = [TextNode("This is *bold* and *italic*", TextType.TEXT)]
+        result = split_nodes_delimiter(nodes, "*", TextType.BOLD)
+        expected = [
+            TextNode("This is ", TextType.TEXT),
+            TextNode("bold", TextType.BOLD),
+            TextNode(" and ", TextType.TEXT),
+            TextNode("italic", TextType.BOLD),
+        ]
+        self.assertEqual(result, expected)
+
+    def test_uneven_delimiters(self):
+        nodes = [TextNode("This is *missing end delimiter", TextType.TEXT)]
+        with self.assertRaises(Exception) as context:
+            split_nodes_delimiter(nodes, "*", TextType.BOLD)
+        self.assertEqual(str(context.exception), "Missing closing delimiter")
+
+    def test_non_text_nodes(self):
+        nodes = [
+            TextNode("Hello *bold* world", TextType.TEXT),
+            TextNode("Link", TextType.LINK, url="http://example.com"),
+        ]
+        result = split_nodes_delimiter(nodes, "*", TextType.BOLD)
+        expected = [
+            TextNode("Hello ", TextType.TEXT),
+            TextNode("bold", TextType.BOLD),
+            TextNode(" world", TextType.TEXT),
+            TextNode("Link", TextType.LINK, url="http://example.com"),
+        ]
+        self.assertEqual(result, expected)
+
+    def test_multiple_delimiter_pairs(self):
+        nodes = [TextNode("text *code* more *code* end", TextType.TEXT)]
+        result = split_nodes_delimiter(nodes, "*", TextType.CODE)
+        expected = [
+            TextNode("text ", TextType.TEXT),
+            TextNode("code", TextType.CODE),
+            TextNode(" more ", TextType.TEXT),
+            TextNode("code", TextType.CODE),
+            TextNode(" end", TextType.TEXT),
+        ]
+        self.assertEqual(result, expected)
+
+    def test_empty_delimiter_pairs(self):
+        nodes = [TextNode("text ** empty ** end", TextType.TEXT)]
+        result = split_nodes_delimiter(nodes, "*", TextType.BOLD)
+        expected = [
+            TextNode("text ", TextType.TEXT),
+            TextNode("", TextType.BOLD),
+            TextNode(" empty ", TextType.TEXT),
+            TextNode("", TextType.BOLD),
+            TextNode(" end", TextType.TEXT),
+        ]
+        self.assertEqual(result, expected)
+
+    def test_uneven_delimiters(self):
+        nodes = [TextNode("text *missing end delimiter", TextType.TEXT)]
+        with self.assertRaises(Exception) as context:
+            split_nodes_delimiter(nodes, "*", TextType.BOLD)
+        self.assertEqual(str(context.exception), "Missing closing delimiter")
+
+    def test_non_text_nodes(self):
+        nodes = [
+            TextNode("text *bold* text", TextType.TEXT),
+            TextNode("Link", TextType.LINK, url="http://example.com"),
+        ]
+        result = split_nodes_delimiter(nodes, "*", TextType.BOLD)
+        expected = [
+            TextNode("text ", TextType.TEXT),
+            TextNode("bold", TextType.BOLD),
+            TextNode(" text", TextType.TEXT),
+            TextNode("Link", TextType.LINK, url="http://example.com"),
+        ]
+        self.assertEqual(result, expected)
+
+if __name__ == "__main__":
+    unittest.main()
