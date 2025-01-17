@@ -1,10 +1,10 @@
 from textnode import TextNode, TextType
-from parentnode import *
+from parentnode import ParentNode
+from extract_alttext import extract_markdown_images
 
 def main():
-    node = ParentNode("div", [], {"class": "empty"})
-    for child in node.children:
-        print(f"debug - {child}")
+    text = "This is text with a ![rick roll](https://i.imgur.com/aKaOqIh.gif) and ![](https://i.imgur.com/fJRm4Vk.jpeg)"
+    print(f"debug - {extract_markdown_images(text)}")
 
 if __name__ == "__main__":
     main()
