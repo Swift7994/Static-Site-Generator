@@ -1,6 +1,6 @@
 import unittest
 from textnode import TextType, TextNode
-from splitnodes import split_nodes_delimiter
+from splitnodes import split_nodes_delimiter, split_nodes_image, split_nodes_link
 
 class TestSplitNodesDelimiter(unittest.TestCase):
     def test_split_simple(self):
@@ -92,6 +92,210 @@ class TestSplitNodesDelimiter(unittest.TestCase):
             TextNode("Link", TextType.LINK, url="http://example.com"),
         ]
         self.assertEqual(result, expected)
+
+class TestSplitNodesImage(unittest.TestCase):
+
+    def test_single_image(self):
+        nodes = [TextNode("Here is an image ![example](https://example.com/image.png).", TextType.TEXT)]
+        result = split_nodes_image(nodes)
+        expected = [
+            TextNode("Here is an image ", TextType.TEXT),
+            TextNode("example", TextType.IMAGE, "https://example.com/image.png"),
+            TextNode(".", TextType.TEXT),
+        ]
+        self.assertEqual(result, expected)
+
+    def test_multiple_images(self):
+        nodes = [
+            TextNode(
+                "This contains ![image1](https://example.com/img1.png) and ![image2](https://example.com/img2.png).",
+                TextType.TEXT,
+            )
+        ]
+        result = split_nodes_image(nodes)
+        expected = [
+            TextNode("This contains ", TextType.TEXT),
+            TextNode("image1", TextType.IMAGE, "https://example.com/img1.png"),
+            TextNode(" and ", TextType.TEXT),
+            TextNode("image2", TextType.IMAGE, "https://example.com/img2.png"),
+            TextNode(".", TextType.TEXT),
+        ]
+        self.assertEqual(result, expected)
+
+    def test_no_images(self):
+        nodes = [TextNode("This text has no images.", TextType.TEXT)]
+        result = split_nodes_image(nodes)
+        expected = [TextNode("This text has no images.", TextType.TEXT)]
+        self.assertEqual(result, expected)
+
+    def test_empty_input(self):
+        nodes = []
+        result = split_nodes_image(nodes)
+        expected = []
+        self.assertEqual(result, expected)
+
+    def test_empty_text_node(self):
+        nodes = [TextNode("", TextType.TEXT)]
+        result = split_nodes_image(nodes)
+        expected = []
+        self.assertEqual(result, expected)
+
+    def test_non_text_node(self):
+        nodes = [
+            TextNode("Here is an image ![example](https://example.com/image.png).", TextType.TEXT),
+            TextNode("Unchanged node", TextType.IMAGE, "https://example.com/other_image.png"),
+        ]
+        result = split_nodes_image(nodes)
+        expected = [
+            TextNode("Here is an image ", TextType.TEXT),
+            TextNode("example", TextType.IMAGE, "https://example.com/image.png"),
+            TextNode(".", TextType.TEXT),
+            TextNode("Unchanged node", TextType.IMAGE, "https://example.com/other_image.png"),
+        ]
+        self.assertEqual(result, expected)
+
+    def test_unclosed_image(self):
+        nodes = [TextNode("Here is an ![incomplete image(https://example.com/image.png).", TextType.TEXT)]
+        result = split_nodes_image(nodes)
+        expected = [TextNode("Here is an ![incomplete image(https://example.com/image.png).", TextType.TEXT)]
+        self.assertEqual(result, expected)
+
+    def test_image_without_alt_text(self):
+        nodes = [TextNode("Here is an image ![](https://example.com/image.png).", TextType.TEXT)]
+        result = split_nodes_image(nodes)
+        expected = [
+            TextNode("Here is an image ", TextType.TEXT),
+            TextNode("", TextType.IMAGE, "https://example.com/image.png"),
+            TextNode(".", TextType.TEXT),
+        ]
+        self.assertEqual(result, expected)
+
+    def test_special_characters_in_image_url(self):
+        nodes = [
+            TextNode(
+                "Here is an image ![special](https://example.com/image_with-special_chars?foo=bar&baz=qux).",
+                TextType.TEXT,
+            )
+        ]
+        result = split_nodes_image(nodes)
+        expected = [
+            TextNode("Here is an image ", TextType.TEXT),
+            TextNode("special", TextType.IMAGE, "https://example.com/image_with-special_chars?foo=bar&baz=qux"),
+            TextNode(".", TextType.TEXT),
+        ]
+        self.assertEqual(result, expected)
+
+    def test_large_input(self):
+        text = " ".join([f"This is an ![image{i}](https://example{i}.com/image.png)" for i in range(100)])
+        nodes = [TextNode(text, TextType.TEXT)]
+        result = split_nodes_image(nodes)
+
+        # Expected: 100 images, with alternating text nodes
+        self.assertEqual(len(result), 200)
+        self.assertEqual(result[0], TextNode("This is an ", TextType.TEXT))
+        self.assertEqual(result[-1], TextNode("image99", TextType.IMAGE, "https://example99.com/image.png"))
+
+class TestSplitNodesLink(unittest.TestCase):
+
+    def test_single_markdown_link(self):
+        nodes = [TextNode("This is a [link](https://example.com).", TextType.TEXT)]
+        result = split_nodes_link(nodes)
+        expected = [
+            TextNode("This is a ", TextType.TEXT),
+            TextNode("link", TextType.LINK, "https://example.com"),
+            TextNode(".", TextType.TEXT),
+        ]
+        self.assertEqual(result, expected)
+
+    def test_multiple_markdown_links(self):
+        nodes = [
+            TextNode(
+                "Here is a [link1](https://example.com) and another [link2](https://example2.com).",
+                TextType.TEXT,
+            )
+        ]
+        result = split_nodes_link(nodes)
+        expected = [
+            TextNode("Here is a ", TextType.TEXT),
+            TextNode("link1", TextType.LINK, "https://example.com"),
+            TextNode(" and another ", TextType.TEXT),
+            TextNode("link2", TextType.LINK, "https://example2.com"),
+            TextNode(".", TextType.TEXT),
+        ]
+        self.assertEqual(result, expected)
+
+    def test_no_markdown_links(self):
+        nodes = [TextNode("This text has no links.", TextType.TEXT)]
+        result = split_nodes_link(nodes)
+        expected = [TextNode("This text has no links.", TextType.TEXT)]
+        self.assertEqual(result, expected)
+
+    def test_empty_input(self):
+        nodes = []
+        result = split_nodes_link(nodes)
+        expected = []
+        self.assertEqual(result, expected)
+
+    def test_empty_text_node(self):
+        nodes = [TextNode("", TextType.TEXT)]
+        result = split_nodes_link(nodes)
+        expected = []
+        self.assertEqual(result, expected)
+
+    def test_non_text_node(self):
+        nodes = [
+            TextNode("This is a [link](https://example.com).", TextType.TEXT),
+            TextNode("Unchanged node", TextType.LINK, "https://other.com"),
+        ]
+        result = split_nodes_link(nodes)
+        expected = [
+            TextNode("This is a ", TextType.TEXT),
+            TextNode("link", TextType.LINK, "https://example.com"),
+            TextNode(".", TextType.TEXT),
+            TextNode("Unchanged node", TextType.LINK, "https://other.com"),
+        ]
+        self.assertEqual(result, expected)
+
+    def test_unclosed_markdown_link(self):
+        nodes = [TextNode("Here is an [incomplete link(https://example.com).", TextType.TEXT)]
+        result = split_nodes_link(nodes)
+        expected = [TextNode("Here is an [incomplete link(https://example.com).", TextType.TEXT)]
+        self.assertEqual(result, expected)
+
+    def test_link_without_alt_text(self):
+        nodes = [TextNode("Here is a [](https://example.com).", TextType.TEXT)]
+        result = split_nodes_link(nodes)
+        expected = [
+            TextNode("Here is a ", TextType.TEXT),
+            TextNode("", TextType.LINK, "https://example.com"),
+            TextNode(".", TextType.TEXT),
+        ]
+        self.assertEqual(result, expected)
+
+    def test_special_characters_in_links(self):
+        nodes = [
+            TextNode(
+                "Here is a [special](https://example.com/with-special_chars?foo=bar&baz=qux).",
+                TextType.TEXT,
+            )
+        ]
+        result = split_nodes_link(nodes)
+        expected = [
+            TextNode("Here is a ", TextType.TEXT),
+            TextNode("special", TextType.LINK, "https://example.com/with-special_chars?foo=bar&baz=qux"),
+            TextNode(".", TextType.TEXT),
+        ]
+        self.assertEqual(result, expected)
+
+    def test_large_input(self):
+        text = " ".join([f"This is [link{i}](https://example{i}.com)" for i in range(100)])
+        nodes = [TextNode(text, TextType.TEXT)]
+        result = split_nodes_link(nodes)
+
+        # Expected: 100 links, with alternating text nodes
+        self.assertEqual(len(result), 200)
+        self.assertEqual(result[0], TextNode("This is ", TextType.TEXT))
+        self.assertEqual(result[-1], TextNode("link99", TextType.LINK, "https://example99.com"))
 
 if __name__ == "__main__":
     unittest.main()

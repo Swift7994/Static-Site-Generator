@@ -1,10 +1,13 @@
 from textnode import TextNode, TextType
 from parentnode import ParentNode
-from extract_alttext import extract_markdown_images
+from splitnodes import is_image_or_link
 
 def main():
-    text = "This is text with a ![rick roll](https://i.imgur.com/aKaOqIh.gif) and ![](https://i.imgur.com/fJRm4Vk.jpeg)"
-    print(f"debug - {extract_markdown_images(text)}")
+    node = TextNode("This is text with a ![rick roll](https://i.imgur.com/aKaOqIh.gif) and ![obi wan](https://i.imgur.com/fJRm4Vk.jpeg)",
+    TextType.TEXT,
+)
+    text = "This is text with a ![rick roll](https://i.imgur.com/aKaOqIh.gif) and ![obi wan](https://i.imgur.com/fJRm4Vk.jpeg)"
+    print(f"debug - {is_image_or_link(text):}")
 
 if __name__ == "__main__":
     main()
