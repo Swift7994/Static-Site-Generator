@@ -18,11 +18,11 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
             new_nodes.append(node)
             continue
 
-        if delimiter not in node.value:
+        if delimiter not in node.text:
             new_nodes.append(node)
             continue
 
-        new_nodes.extend(split_text(node.value))
+        new_nodes.extend(split_text(node.text))
 
     return new_nodes
 
@@ -118,3 +118,11 @@ def split_nodes_link(old_nodes):
         new_nodes.extend(split_text(node.text, markdown_data))
 
     return new_nodes
+
+def text_to_textnodes(text):
+    bold_nodes = split_nodes_delimiter([TextNode(text, TextType.TEXT)], "**", TextType.BOLD)
+    bold_italic_nodes = split_nodes_delimiter(bold_nodes, "*", TextType.ITALIC)
+    bold_italic_code_nodes = split_nodes_delimiter(bold_italic_nodes, "`", TextType.CODE)
+    bold_italic_code_link_nodes = split_nodes_image(bold_italic_code_nodes)
+    split_nodes = split_nodes_link(bold_italic_code_link_nodes)
+    return split_nodes
