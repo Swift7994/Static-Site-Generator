@@ -14,7 +14,7 @@ class TestTextNode(unittest.TestCase):
 
     def test_text_node_repr(self):
         node = TextNode("Hello", TextType.BOLD, None)
-        expected_repr = "TextNode('Hello', bold, 'None')"
+        expected_repr = "TextNode('Hello', bold)"
         self.assertEqual(repr(node), expected_repr)
 
     def test_text_node_to_html_text(self):

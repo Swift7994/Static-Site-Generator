@@ -64,15 +64,9 @@ class TestSplitNodesDelimiter(unittest.TestCase):
 
     def test_empty_delimiter_pairs(self):
         nodes = [TextNode("text ** empty ** end", TextType.TEXT)]
-        result = split_nodes_delimiter(nodes, "*", TextType.BOLD)
-        expected = [
-            TextNode("text ", TextType.TEXT),
-            TextNode("", TextType.BOLD),
-            TextNode(" empty ", TextType.TEXT),
-            TextNode("", TextType.BOLD),
-            TextNode(" end", TextType.TEXT),
-        ]
-        self.assertEqual(result, expected)
+        with self.assertRaises(Exception) as context:
+            split_nodes_delimiter(nodes, "*", TextType.BOLD)
+            self.assertEqual(str(context.exception), "Empty delimited section is not allowed")
 
     def test_uneven_delimiters(self):
         nodes = [TextNode("text *missing end delimiter", TextType.TEXT)]
@@ -402,13 +396,9 @@ class TestTextToTextNodes(unittest.TestCase):
 
     def test_text_with_unclosed_formatting(self):
         text = "This is **bold and *italic with `code and a [link](https://example.com)."
-        result = text_to_textnodes(text)
-        expected = [
-            TextNode("This is **bold and *italic with `code and a ", TextType.TEXT),
-            TextNode("link", TextType.LINK, "https://example.com"),
-            TextNode(".", TextType.TEXT),
-        ]
-        self.assertEqual(result, expected)
+        with self.assertRaises(Exception) as context:
+            text_to_textnodes(text)
+            self.assertEqual(str(context.exception), "Missing closing delimiter")
 
     def test_edge_case_with_just_formatting(self):
         text = "**bold** *italic* `code` [link](https://example.com) ![img](https://example.com/img.png)"

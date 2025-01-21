@@ -6,10 +6,14 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
         parts = text.split(delimiter)
         if len(parts) % 2 == 0:
             raise Exception("Missing closing delimiter")
-        nodes = [
-            TextNode(part, text_type if i % 2 else TextType.TEXT)
-            for i, part in enumerate(parts)
-        ]
+        nodes = []
+        for i, part in enumerate(parts):
+            if part == "" and i % 2 == 1:
+                raise Exception("Empty delimited section is not allowed")
+            if part == "" and i % 2 == 0:
+                continue
+            node_type = text_type if i % 2 else TextType.TEXT
+            nodes.append(TextNode(part, node_type))
         return nodes
     
     new_nodes = []
