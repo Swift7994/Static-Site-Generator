@@ -130,3 +130,6 @@ def text_to_textnodes(text):
     bold_italic_code_link_nodes = split_nodes_image(bold_italic_code_nodes)
     split_nodes = split_nodes_link(bold_italic_code_link_nodes)
     return split_nodes
+
+def markdown_to_blocks(markdown):
+    return [block.strip() for block in markdown.split("\n\n") if block.strip()]

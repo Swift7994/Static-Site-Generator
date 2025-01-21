@@ -4,33 +4,44 @@ from htmlnode import HTMLNode
 
 
 class TestHTMLNode(unittest.TestCase):
-    def test_eq(self):
+    def test_initialization(self):
+        node = HTMLNode(tag="div", value="Hello", children=None, props={"class": "container"})
+        self.assertEqual(node.tag, "div")
+        self.assertEqual(node.value, "Hello")
+        self.assertEqual(node.children, None)
+        self.assertEqual(node.props, {"class": "container"})
+
+    def test_props_to_html_with_props(self):
+        node = HTMLNode(props={"class": "container", "id": "main"})
+        self.assertEqual(node.props_to_html(), ' class="container" id="main"')
+
+    def test_props_to_html_no_props(self):
         node = HTMLNode()
-        node2 = HTMLNode()
-        self.assertEqual(node, node2)
+        self.assertEqual(node.props_to_html(), "")
 
-    def test2_not_eq(self):
-        node = HTMLNode("test tag", "test value")
-        node2 = HTMLNode("test tag", "test AAvalue")
-        self.assertNotEqual(node, node2)
+    def test_equality_same_node(self):
+        node1 = HTMLNode(tag="p", value="Hello", children=None, props={"class": "text"})
+        node2 = HTMLNode(tag="p", value="Hello", children=None, props={"class": "text"})
+        self.assertEqual(node1, node2)
 
-    def test3_eq(self):
-        node = HTMLNode("a", "Click here", children=None, props={"href": "https://www.example.com", "target": "_blank"})
-        node2 = HTMLNode("a", "Click here", children=None, props={"href": "https://www.example.com", "target": "_blank"})
-        self.assertEqual(node, node2)
+    def test_equality_different_node(self):
+        node1 = HTMLNode(tag="p", value="Hello", children=None, props={"class": "text"})
+        node2 = HTMLNode(tag="div", value="Hello", children=None, props={"class": "text"})
+        self.assertNotEqual(node1, node2)
 
-    def test4_eq(self):
-        node = HTMLNode(tag="ul", value=None, children=[
-        HTMLNode(tag="li", value="Item 1", children=None, props=None),
-        HTMLNode(tag="li", value="Item 2", children=None, props=None),
-    ], 
-    props=None)
-        node2 = HTMLNode(tag="ul", value=None, children=[
-        HTMLNode(tag="li", value="Item 1", children=None, props=None),
-        HTMLNode(tag="li", value="Item 2", children=None, props=None),
-    ], 
-    props=None)
-        self.assertEqual(node, node2)
+    def test_equality_with_non_htmlnode(self):
+        node = HTMLNode(tag="p", value="Hello", children=None, props={"class": "text"})
+        self.assertNotEqual(node, "not a node")
+
+    def test_repr(self):
+        node = HTMLNode(tag="span", value="Content", children=None, props={"style": "color: red;"})
+        expected_repr = "HTMLNode(span, Content, children: None, {'style': 'color: red;'})"
+        self.assertEqual(repr(node), expected_repr)
+
+    def test_to_html_not_implemented(self):
+        node = HTMLNode(tag="div", value="Some value")
+        with self.assertRaises(NotImplementedError):
+            node.to_html()
 
 
 
