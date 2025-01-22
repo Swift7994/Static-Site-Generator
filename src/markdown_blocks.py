@@ -26,12 +26,13 @@ def is_heading(text):
     
     
 def is_code(text):
-    return text[:3] == "```" and text[-3:] == "```" and text[3:-3].strip() != ""
+    lines = text.split("\n")
+    return len(lines) >= 3 and text[:3] == "```" and text[-3:] == "```" and text[3:-3].strip() != ""
         
     
 def is_quote(text):
     lines = text.split("\n")
-    if all(line.startswith(">") for line in lines):
+    if all(line.startswith("> ") for line in lines):
         return True
     return False
     
