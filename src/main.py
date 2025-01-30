@@ -1,19 +1,19 @@
-from textnode import TextNode, TextType
-from splitnodes import text_to_textnodes
-import unittest
+import os
+import shutil
 
-class TestCount(unittest.TestCase):
-    def test_count(self):
-        print(f"Test discovered: {len(unittest.TestLoader().loadTestsFromTestCase(TestCount).__dict__['_tests'])}")
+from copystatic import copy_files
 
+
+path_static = "./static"
+path_public = "./public"
 
 def main():
-    node = TextNode("This is text with a ![rick roll](https://i.imgur.com/aKaOqIh.gif) and ![obi wan](https://i.imgur.com/fJRm4Vk.jpeg)",
-    TextType.TEXT)
-    testcount = TestCount()
-    print (testcount.test_count)
-    text = "This is **text** with an *italic* word and a `code block` and an ![obi wan image](https://i.imgur.com/fJRm4Vk.jpeg) and a [link](https://boot.dev)"
-    print(f"debug - ")
+    print("Copying static files to public directory...")
+    copy_files(path_static, path_public)
+
+
+
+
 
 if __name__ == "__main__":
     main()
