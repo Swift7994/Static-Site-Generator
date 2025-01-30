@@ -1,5 +1,5 @@
 import unittest
-from markdown_blocks import markdown_to_blocks, block_to_block_type, is_heading, is_code, is_quote, is_unordered_list, is_ordered_list
+from markdown_blocks import *
 
 
 class TestMarkdownToBlocks(unittest.TestCase):
@@ -132,6 +132,80 @@ class TestIsOrderedList(unittest.TestCase):
         self.assertFalse(is_ordered_list("1. Item 1\n3. Item 2"))  # Out of order
         self.assertFalse(is_ordered_list("Item 1\nItem 2"))  # No numbers
         self.assertFalse(is_ordered_list("1. Item\nSecond item"))  # Inconsistent formatting
+
+
+class TestMarkdownToHtml(unittest.TestCase):
+
+    def test_paragraph_to_html_node(self):
+        block = "This is a paragraph."
+        result = paragraph_to_html_node(block)
+        self.assertEqual(result.tag, "p")
+        self.assertEqual(len(result.children), 1)
+        self.assertEqual(result.children[0].value, "This is a paragraph.")
+
+    def test_heading_to_html_node(self):
+        block = "### Heading Level 3"
+        result = heading_to_html_node(block)
+        self.assertEqual(result.tag, "h3")
+        self.assertEqual(len(result.children), 1)
+        self.assertEqual(result.children[0].value, "Heading Level 3")
+
+    def test_heading_to_html_node_invalid_level(self):
+        block = "####### Invalid Heading"
+        with self.assertRaises(ValueError):
+            heading_to_html_node(block)
+
+    def test_code_to_html_node_invalid(self):
+        block = "`print('Missing backticks')`"
+        with self.assertRaises(ValueError):
+            code_to_html_node(block)
+
+    def test_quote_to_html_node(self):
+        block = "> This is a quote.\n> It spans multiple lines."
+        result = quote_to_html_node(block)
+        self.assertEqual(result.tag, "blockquote")
+        self.assertEqual(len(result.children), 1)
+        self.assertEqual(result.children[0].value, "This is a quote. It spans multiple lines.")
+
+    def test_unordered_list_to_html_node(self):
+        block = "- Item 1\n- Item 2\n- Item 3"
+        result = unordered_list_to_html_node(block)
+        self.assertEqual(result.tag, "ul")
+        self.assertEqual(len(result.children), 3)
+        self.assertEqual(result.children[0].tag, "li")
+        self.assertEqual(result.children[0].children[0].value, "Item 1")
+        self.assertEqual(result.children[1].children[0].value, "Item 2")
+        self.assertEqual(result.children[2].children[0].value, "Item 3")
+
+    def test_ordered_list_to_html_node(self):
+        block = "1. Step 1\n2. Step 2\n3. Step 3"
+        result = ordered_list_to_html_node(block)
+        self.assertEqual(result.tag, "ol")
+        self.assertEqual(len(result.children), 3)
+        self.assertEqual(result.children[0].tag, "li")
+        self.assertEqual(result.children[0].children[0].value, "Step 1")
+        self.assertEqual(result.children[1].children[0].value, "Step 2")
+        self.assertEqual(result.children[2].children[0].value, "Step 3")
+
+    def test_process_block(self):
+        block = "This is a test block."
+        result = process_block(block, "div")
+        self.assertEqual(result.tag, "div")
+        self.assertEqual(len(result.children), 1)
+        self.assertEqual(result.children[0].value, "This is a test block.")
+
+    def test_markdown_to_html_node(self):
+        markdown = """# Title\n\nThis is a paragraph.\n\n- Item 1\n- Item 2"""
+        result = markdown_to_html_node(markdown)
+        self.assertEqual(result.tag, "div")
+        self.assertEqual(len(result.children), 3)
+        self.assertEqual(result.children[0].tag, "h1")
+        self.assertEqual(result.children[0].children[0].value, "Title")
+        self.assertEqual(result.children[1].tag, "p")
+        self.assertEqual(result.children[1].children[0].value, "This is a paragraph.")
+        self.assertEqual(result.children[2].tag, "ul")
+        self.assertEqual(result.children[2].children[0].tag, "li")
+        self.assertEqual(result.children[2].children[0].children[0].value, "Item 1")
 
 
 if __name__ == "__main__":
