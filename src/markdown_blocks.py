@@ -1,6 +1,6 @@
 from parentnode import ParentNode
 from splitnodes import text_to_textnodes
-from textnode import TextNode, text_node_to_html_node
+from textnode import text_node_to_html_node
 
 
 def markdown_to_blocks(markdown_doc):
@@ -107,7 +107,7 @@ def code_to_html_node(block):
     if not (block.startswith("```") and block.endswith("```")):
         raise ValueError("Invalid code block")
     text = block[3:-3].strip()
-    children = [TextNode(text)]  # Code blocks are treated as raw text
+    children = text_to_children(text)
     code_node = ParentNode("code", children)
     return ParentNode("pre", [code_node])
 
