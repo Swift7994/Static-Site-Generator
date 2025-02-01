@@ -1,6 +1,6 @@
 import os
 from copystatic import copy_files
-from generate_page import generate_page
+from generate_page import generate_pages_recursive
 
 
 path_static = "./static"
@@ -12,12 +12,8 @@ def main():
     print("Copying static files to public directory...")
     copy_files(path_static, path_public)
 
-    print("Generating page...")
-    generate_page(
-        os.path.join(path_content, "index.md"),
-        path_template,
-        os.path.join(path_public, "index.html"),
-    )
+    print("Generating content")
+    generate_pages_recursive(path_content, path_template, path_public)
 
 
 
