@@ -1,4 +1,3 @@
-import os
 from copystatic import copy_files
 from generate_page import generate_pages_recursive
 
