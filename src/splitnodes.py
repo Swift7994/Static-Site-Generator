@@ -156,6 +156,7 @@ def split_nodes_link(old_nodes):
 
     return new_nodes
 
+
 # This function processes the input text by identifying and splitting different Markdown syntax,
 # such as bold, italic, code, images, and links. It returns a list of `TextNode` objects 
 # representing the text with corresponding types for each Markdown element.
